@@ -26,6 +26,8 @@ class CarouselOptions {
   ///Determines if carousel should loop infinitely or be limited to item length.
   ///
   ///Defaults to true, i.e. infinite loop.
+  ///
+  /// TODO: fix infinite scroll using expandable_view package
   final bool enableInfiniteScroll;
 
   ///Determines if carousel should loop to the closest occurence of requested page.
@@ -138,7 +140,6 @@ class CarouselOptions {
     this.aspectRatio: 16 / 9,
     this.viewportFraction: 0.8,
     this.initialPage: 0,
-    this.enableInfiniteScroll: true,
     this.animateToClosest: true,
     this.reverse: false,
     this.autoPlay: false,
@@ -160,7 +161,7 @@ class CarouselOptions {
     this.disableCenter: false,
     this.padEnds = true,
     this.clipBehavior: Clip.hardEdge,
-  });
+  }) : this.enableInfiniteScroll = false;
 
   ///Generate new [CarouselOptions] based on old ones.
 
@@ -169,7 +170,6 @@ class CarouselOptions {
           double? aspectRatio,
           double? viewportFraction,
           int? initialPage,
-          bool? enableInfiniteScroll,
           bool? reverse,
           bool? autoPlay,
           Duration? autoPlayInterval,
@@ -195,7 +195,6 @@ class CarouselOptions {
         aspectRatio: aspectRatio ?? this.aspectRatio,
         viewportFraction: viewportFraction ?? this.viewportFraction,
         initialPage: initialPage ?? this.initialPage,
-        enableInfiniteScroll: enableInfiniteScroll ?? this.enableInfiniteScroll,
         reverse: reverse ?? this.reverse,
         autoPlay: autoPlay ?? this.autoPlay,
         autoPlayInterval: autoPlayInterval ?? this.autoPlayInterval,

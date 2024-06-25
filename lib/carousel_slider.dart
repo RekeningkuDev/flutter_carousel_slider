@@ -3,6 +3,7 @@ library carousel_slider;
 import 'dart:async';
 
 import 'package:carousel_slider/carousel_state.dart';
+import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +34,7 @@ class CarouselSlider extends StatefulWidget {
   /// A [MapController], used to control the map.
   final CarouselControllerImpl _carouselController;
 
-  final int? itemCount;
+  final int itemCount;
 
   CarouselSlider(
       {required this.items,
@@ -142,7 +143,7 @@ class CarouselSliderState extends State<CarouselSlider>
             CarouselPageChangedReason previousReason = mode;
             changeMode(CarouselPageChangedReason.timed);
             int nextPage = carouselState!.pageController!.page!.round() + 1;
-            int itemCount = widget.itemCount ?? widget.items!.length;
+            int itemCount = widget.itemCount;
 
             if (nextPage >= itemCount &&
                 widget.options.enableInfiniteScroll == false) {
@@ -191,8 +192,7 @@ class CarouselSliderState extends State<CarouselSlider>
     if (widget.options.height != null) {
       wrapper = Container(height: widget.options.height, child: child);
     } else {
-      wrapper =
-          AspectRatio(aspectRatio: widget.options.aspectRatio, child: child);
+      wrapper = Container(child: child);
     }
 
     if (true == widget.disableGesture) {
@@ -300,7 +300,8 @@ class CarouselSliderState extends State<CarouselSlider>
 
   @override
   Widget build(BuildContext context) {
-    return getGestureWrapper(PageView.builder(
+    return getGestureWrapper(ExpandablePageView.builder(
+      animationDuration: Duration.zero,
       padEnds: widget.options.padEnds,
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
         scrollbars: false,
@@ -316,7 +317,9 @@ class CarouselSliderState extends State<CarouselSlider>
       pageSnapping: widget.options.pageSnapping,
       controller: carouselState!.pageController,
       reverse: widget.options.reverse,
-      itemCount: widget.options.enableInfiniteScroll ? null : widget.itemCount,
+      itemCount: widget.options.enableInfiniteScroll
+          ? carouselState!.realPage
+          : widget.itemCount,
       key: widget.options.pageViewKey,
       onPageChanged: (int index) {
         int currentPage = getRealIndex(index + carouselState!.initialPage,
@@ -355,7 +358,7 @@ class CarouselSliderState extends State<CarouselSlider>
                 BuildContext storageContext = carouselState!
                     .pageController!.position.context.storageContext;
                 final double? previousSavedPosition =
-                    PageStorage.of(storageContext)?.readState(storageContext)
+                    PageStorage.of(storageContext).readState(storageContext)
                         as double?;
                 if (previousSavedPosition != null) {
                   itemOffset = previousSavedPosition - idx.toDouble();
@@ -373,13 +376,11 @@ class CarouselSliderState extends State<CarouselSlider>
                   Curves.easeOut.transform(distortionRatio as double);
             }
 
-            final double height = widget.options.height ??
-                MediaQuery.of(context).size.width *
-                    (1 / widget.options.aspectRatio);
+            final double? height = widget.options.height;
 
             if (widget.options.scrollDirection == Axis.horizontal) {
               return getCenterWrapper(getEnlargeWrapper(child,
-                  height: distortionValue * height,
+                  height: height,
                   scale: distortionValue,
                   itemOffset: itemOffset));
             } else {
