@@ -1,3 +1,5 @@
+**Use this repo for dynamic height carousel slider content**
+
 # carousel_slider
 
 A carousel slider widget.
